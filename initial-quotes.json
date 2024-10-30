@@ -1,0 +1,54 @@
+{
+  "quotes": [
+    {
+      "id": 1,
+      "quote": "The only way to do great work is to love what you do.",
+      "author": "Steve Jobs"
+    },
+    {
+      "id": 2,
+      "quote": "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+      "author": "Winston Churchill"
+    },
+    {
+      "id": 3,
+      "quote": "The future belongs to those who believe in the beauty of their dreams.",
+      "author": "Eleanor Roosevelt"
+    },
+    {
+      "id": 4,
+      "quote": "Everything you've ever wanted is on the other side of fear.",
+      "author": "George Addair"
+    },
+    {
+      "id": 5,
+      "quote": "The only limit to our realization of tomorrow will be our doubts of today.",
+      "author": "Franklin D. Roosevelt"
+    },
+    {
+      "id": 6,
+      "quote": "Life is what happens when you're busy making other plans.",
+      "author": "John Lennon"
+    },
+    {
+      "id": 7,
+      "quote": "The way to get started is to quit talking and begin doing.",
+      "author": "Walt Disney"
+    },
+    {
+      "id": 8,
+      "quote": "Don't watch the clock; do what it does. Keep going.",
+      "author": "Sam Levenson"
+    },
+    {
+      "id": 9,
+      "quote": "The best time to plant a tree was 20 years ago. The second best time is now.",
+      "author": "Chinese Proverb"
+    },
+    {
+      "id": 10,
+      "quote": "Whether you think you can or you think you can't, you're right.",
+      "author": "Henry Ford"
+    }
+  ]
+}

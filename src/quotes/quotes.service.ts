@@ -1,22 +1,50 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class QuotesService {
   private quotes: string[] = [];
+  private s3Client: S3Client;
 
-  constructor() {
-    this.quotes = [
-      'The only limit to our realization of tomorrow is our doubts of today.',
-      'The purpose of our lives is to be happy.',
-      "Life is what happens when you're busy making other plans.",
-      'Get busy living or get busy dying.',
-      'You have within you right now, everything you need to deal with whatever the world can throw at you.',
-      'The best way to predict the future is to invent it.',
-      'Life is 10% what happens to us and 90% how we react to it.',
-      'The only way to do great work is to love what you do.',
-      'Success is not the key to happiness. Happiness is the key to success.',
-      'Your time is limited, so don’t waste it living someone else’s life.',
-    ];
+  constructor(private configService: ConfigService) {
+    this.s3Client = new S3Client({
+      region: this.configService.get('AWS_REGION'),
+      credentials: {
+        accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID') || '',
+        secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY') || '',
+      },
+    });
+  }
+
+  async onModuleInit() {
+    await this.loadQuotesFromS3();
+  }
+
+  private async loadQuotesFromS3() {
+    try {
+      const bucketName = this.configService.get('S3_BUCKET_NAME');
+      const objectKey = this.configService.get('OBJECT_KEY');
+
+      console.log('Loading quotes from S3...', bucketName, objectKey);
+
+      const command = new GetObjectCommand({
+        Bucket: bucketName,
+        Key: objectKey,
+      });
+
+      const response = await this.s3Client.send(command);
+      const fileContent = await response.Body?.transformToString();
+
+      if (fileContent) {
+        this.quotes = JSON.parse(fileContent).quotes;
+      } else {
+        this.quotes = [];
+      }
+    } catch (error) {
+      console.error('Error loading quotes from S3:', error);
+      this.quotes = [];
+    }
   }
 
   findAll() {

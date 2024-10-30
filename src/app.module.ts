@@ -1,8 +1,15 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { QuotesModule } from './quotes/quotes.module';
 
 @Module({
-  imports: [QuotesModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    QuotesModule
+  ],
   controllers: [],
   providers: [],
 })

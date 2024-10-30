@@ -1,0 +1,9 @@
+services:
+  quotes-api:
+    image: quotes-api
+    container_name: quotes-api-container
+    build:
+      context: . # Path to Dockerfile
+    ports:
+      - '3000:3000'
+    restart: always
