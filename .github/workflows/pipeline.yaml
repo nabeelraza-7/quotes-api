@@ -50,8 +50,8 @@ jobs:
           ssh -t -i ssh-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.REMOTE_HOST }} << 'EOF'
             cd /quotes-api 
             docker load -i quotes-api.tar 
-            docker compose down 
-            docker compose up -d 
+            docker-compose down 
+            docker-compose up -d 
           EOF
 
       - name: Cleanup
