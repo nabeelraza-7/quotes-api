@@ -5,41 +5,46 @@ on:
   push:
     branches:
       - main
-      
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-22.04
-        
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-          
+
       - name: Set up environment variables
         run: |
-           echo "${{ secrets.ENV }}" | tr " " "\n" >> .env
-      
+          echo "${{ secrets.ENV }}" | tr " " "\n" >> .env
+
       - name: Build Docker image with Docker Compose
         run: |
           docker compose build
-   
+
       - name: Save Docker image
         run: |
           docker save -o quotes-api.tar quotes-api
-   
+
       - name: Copy image to EC2 instance
         run: |
           # Set up the SSH key
           echo "${{ secrets.SSH_KEY }}" >> ssh-key.pem
           sudo chmod 400 ssh-key.pem
-   
-          # Create a target directory on the remote host
-          ssh -i ssh-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.REMOTE_HOST }} 'mkdir -p /quotes-api'
-   
+
+          # Set up the remote environment
+          ssh -i ssh-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.REMOTE_HOST }} << 'EOF'
+            # Create the deployment directory with the appropriate permissions
+            sudo mkdir -p /quotes-api
+            sudo chown -R ec2-user:ec2-user /quotes-api
+            cd /quotes-api
+          EOF
+
           # Copy Docker image and Docker Compose file to the remote server
           scp -i ssh-key.pem -o StrictHostKeyChecking=no .env ec2-user@${{ secrets.REMOTE_HOST }}:/quotes-api/.env 
           scp -i ssh-key.pem -o StrictHostKeyChecking=no quotes-api.tar ec2-user@${{ secrets.REMOTE_HOST }}:/quotes-api/quotes-api.tar
           scp -i ssh-key.pem -o StrictHostKeyChecking=no docker-compose.yml ec2-user@${{ secrets.REMOTE_HOST }}:/quotes-api/docker-compose.yml && echo "done"
-   
+
       - name: Run Docker container with Docker Compose
         run: |
           ssh -t -i ssh-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.REMOTE_HOST }} << 'EOF'
