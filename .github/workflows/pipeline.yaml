@@ -26,23 +26,23 @@ jobs:
         run: |
           docker save -o quotes-api.tar quotes-api
    
-      - name: Copy image to Droplet
+      - name: Copy image to EC2 instance
         run: |
           # Set up the SSH key
           echo "${{ secrets.SSH_KEY }}" >> ssh-key.pem
           sudo chmod 400 ssh-key.pem
    
           # Create a target directory on the remote host
-          ssh -i ssh-key.pem -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} 'mkdir -p /quotes-api'
+          ssh -i ssh-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.REMOTE_HOST }} 'mkdir -p /quotes-api'
    
           # Copy Docker image and Docker Compose file to the remote server
-          scp -i ssh-key.pem -o StrictHostKeyChecking=no .env root@${{ secrets.REMOTE_HOST }}:/quotes-api/.env 
-          scp -i ssh-key.pem -o StrictHostKeyChecking=no quotes-api.tar root@${{ secrets.REMOTE_HOST }}:/quotes-api/quotes-api.tar
-          scp -i ssh-key.pem -o StrictHostKeyChecking=no docker-compose.yml root@${{ secrets.REMOTE_HOST }}:/quotes-api/docker-compose.yml && echo "done"
+          scp -i ssh-key.pem -o StrictHostKeyChecking=no .env ec2-user@${{ secrets.REMOTE_HOST }}:/quotes-api/.env 
+          scp -i ssh-key.pem -o StrictHostKeyChecking=no quotes-api.tar ec2-user@${{ secrets.REMOTE_HOST }}:/quotes-api/quotes-api.tar
+          scp -i ssh-key.pem -o StrictHostKeyChecking=no docker-compose.yml ec2-user@${{ secrets.REMOTE_HOST }}:/quotes-api/docker-compose.yml && echo "done"
    
       - name: Run Docker container with Docker Compose
         run: |
-          ssh -t -i ssh-key.pem -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} << 'EOF'
+          ssh -t -i ssh-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.REMOTE_HOST }} << 'EOF'
             cd /quotes-api 
             docker load -i quotes-api.tar 
             docker compose down 
